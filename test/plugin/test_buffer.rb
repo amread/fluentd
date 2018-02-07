@@ -1112,6 +1112,14 @@ class BufferTest < Test::Unit::TestCase
       c3 = create_chunk(m, ["a" * 128] * 6 + ["a" * 64])
       assert !@p.chunk_size_full?(c3)
     end
+
+    test '#write does not raise BufferOverflowError when chunk is not empty' do
+      m = @p.metadata(timekey: Time.parse('2016-04-11 16:40:00 +0000').to_i)
+
+      assert_nothing_raised Fluent::Plugin::Buffer::BufferOverflowError do
+        @p.write({m => ["a" * 512, "b" * 513 ]})
+      end
+    end
   end
 
   sub_test_case 'with configuration includes chunk_limit_records' do
